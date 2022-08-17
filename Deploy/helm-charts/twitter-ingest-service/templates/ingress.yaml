@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: {{ $.Values.certificate_arn }}
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    external-dns.alpha.kubernetes.io/hostname: {{ $.Values.domain_fqdn }}
+    kubernetes.io/ingress.class: alb
+    #alb.ingress.kubernetes.io/subnets: {{ $.Values.ingress_subnets }}
+    alb.ingress.kubernetes.io/subnets: "subnet-0375dce34fc93aeb6, subnet-05113b3e9b912919f"
+    
+  finalizers:
+  - ingress.k8s.aws/resources
+  generation: 1
+  name: ingress-login-portal-web
+  namespace: login-portal
+spec:
+  rules:
+  - host: {{ .Values.domain_fqdn }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: login-portal-web
+            port:
+              number: 8080
+        path: /*
+        pathType: ImplementationSpecific

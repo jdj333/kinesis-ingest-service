@@ -1,0 +1,36 @@
+pipelines:
+  default:
+    - step:
+        name: 'Build Docker Image'
+        script:
+        # Enable Docker BuildKit
+        - export DOCKER_BUILDKIT=1
+        - cd Service/
+        - docker image build -t ingest-service:$BITBUCKET_BUILD_NUMBER --progress=plain --no-cache .
+        services:
+        - docker
+    - step:
+        name: 'Push Image to ECR'
+        trigger: manual
+        script:
+          - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 251414772678.dkr.ecr.us-east-1.amazonaws.com
+          - docker tag ingest-service:$BITBUCKET_BUILD_NUMBER 251414772678.dkr.ecr.us-east-1.amazonaws.com/coffeetrendsusa-ingest-service:$BITBUCKET_BUILD_NUMBER
+          - docker push 251414772678.dkr.ecr.us-east-1.amazonaws.com/coffeetrendsusa-ingest-service:$BITBUCKET_BUILD_NUMBER
+    - step:
+        name: Deploy to test
+        deployment: test
+        trigger: manual
+        script:
+          - ./Deploy/deploy-helm.sh test $BITBUCKET_BUILD_NUMBER
+    - step:
+        name: Deploy to staging
+        deployment: staging
+        trigger: manual
+        script:
+          - ./Deploy/deploy-helm.sh staging $BITBUCKET_BUILD_NUMBER
+    - step:
+        name: Deploy to production
+        deployment: production
+        trigger: manual
+        script:
+          - ./Deploy/deploy-helm.sh production $BITBUCKET_BUILD_NUMBER

@@ -1,0 +1,39 @@
+green:
+  enabled: false
+blue:
+  enabled: false
+
+production_slot: blue
+replicaCount: 1
+release: latest
+
+### SAP Commerce flags
+perform_system_update: false
+create_type_system: false
+
+nodeenv: "development"
+
+ingress_subnets: ""
+
+certificate_arn: arn:aws:acm:us-west-2:070563935692:certificate/430feabd-7dad-4dcc-b093-c156f179ad73
+
+### Production values
+domain_fqdn: dev.jamesdjenkins.com
+# production_type_system: "DEFAULT"
+
+### Blue/Green values
+blue_type_system: ""
+green_type_system: ""
+
+
+s3_bucket_for_commerce_configurations: ""
+environment: ""
+
+image:
+  repository: 349010428032.dkr.ecr.us-west-2.amazonaws.com/login-portal
+  pullPolicy: IfNotPresent
+  tag: "qas-web-1"
+
+service:
+  type: NodePort
+  port: 8081

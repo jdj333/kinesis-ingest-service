@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    app.kubernetes.io/managed-by: "Helm"
+    meta.helm.sh/release-name: "login-portal-web"
+    meta.helm.sh/release-namespace: "default"
+
+  generation: 1
+  name: deployment-login-portal-web
+  namespace: login-portal
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: login-portal-web
+      release: {{ .Release.Name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: login-portal-web
+        release: {{ .Release.Name }}
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        args: ["default","{{ .Values.environment }}"]
+        imagePullPolicy: Always
+        name: login-portal-web
+        env:
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: VIRTUAL_HOST
+            value: {{ .Values.domain_fqdn }}
+          - name: bearer_token
+            value: {{ .Values.bearer_token }}
+          - name: consumer_key
+            value: {{ .Values.consumer_key }}
+          - name: consumer_secret
+            value: {{ .Values.consumer_secret }}
+          - name: access_token_key
+            value: {{ .Values.access_token_key }}
+          - name: access_token_secret
+            value: {{ .Values.access_token_secret }}
+
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: login-portal-service-account
+      serviceAccountName: login-portal-service-account
+      shareProcessNamespace: false
+      terminationGracePeriodSeconds: 30

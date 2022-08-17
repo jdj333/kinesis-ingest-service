@@ -1,0 +1,5 @@
+TwitterAPI
+tweepy
+boto3
+config
+flask
