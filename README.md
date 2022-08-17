@@ -23,7 +23,7 @@ https://docs.aws.amazon.com/code-samples/latest/catalog/python-kinesis-firehose-
 
 ### Step 1: Deploy Terraform EKS
 
-See [Deployment README.md](deploy/README.md)
+See [Deployment README.md](Deploy/README.md)
 
 ### Step 2: Build Docker Image and Push to ECR
 
@@ -37,7 +37,7 @@ See [Deployment README.md](deploy/README.md)
 
 ### Step 3: Deploy Helm Chart
 
-See [Deployment README.md](deploy/README.md)
+See [Deployment README.md](Deploy/README.md)
 
 ## Option 2: Setup Ingest with Kinesis Firehose (Locally)
 
